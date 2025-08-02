@@ -9,9 +9,9 @@ end
 """
 Calculate trace of hat matrix for Mixed GWR (for effective degrees of freedom)
 """
-function gwr_mixed_trace(x1::Matrix{Float64}, x2::Matrix{Float64},
-  dMat::Matrix{Float64}, bw::Float64, kernel::Int, adaptive::Bool=false)::Float64
-  
+function gwr_mixed_trace(x1::Matrix{T}, x2::Matrix{T}, dMat::Matrix{T}, bw::T;
+  kernel::Int=0, adaptive::Bool=false)::T where {T}
+
   n = size(x1, 1)
   k_global = size(x2, 2)
 
@@ -21,7 +21,7 @@ function gwr_mixed_trace(x1::Matrix{Float64}, x2::Matrix{Float64},
 
   # Step 1: Orthogonalize global variables (same as in gwr_mixed_2)
   for i in 1:k_global
-    mtemp = gwr_q(x1, x2[:, i], dMat, bw, kernel, adaptive)
+    mtemp = gwr_q(x1, x2[:, i], dMat, bw; kernel, adaptive)
     x3[:, i] = x2[:, i] - fitted(x1, mtemp)
   end
 
@@ -32,21 +32,21 @@ function gwr_mixed_trace(x1::Matrix{Float64}, x2::Matrix{Float64},
     ei = e_vec(i, n)
 
     # Regression of unit vector on local variables
-    mtemp = gwr_q(x1, ei, dMat, bw, kernel, adaptive)
+    mtemp = gwr_q(x1, ei, dMat, bw; kernel, adaptive)
     y2 = ei - fitted(x1, mtemp)
 
     # Global regression
-    model2 = gwr_q(x3, y2, dMat, 100000.0, BOXCAR, true)
+    model2 = gwr_q(x3, y2, dMat, 100000.0; kernel=BOXCAR, adaptive=true)
     y3 = ei - fitted(x2, model2)
 
     # Local regression at position i only
-    dMat_i = reshape(dMat[:, i], :, 1)
-    model1 = gwr_q(x1, y3, dMat_i, bw, kernel, adaptive)
-    model2_i = gwr_q(x3, y2, dMat_i, 100000.0, BOXCAR, true)
+    dMat_i = @view dMat[:, i:i] ## TODO: debug here
+    model1 = gwr_q(x1, y3, dMat_i, bw; kernel, adaptive)
+    model2_i = gwr_q(x3, y2, dMat_i, 100000.0; kernel=BOXCAR, adaptive=true)
 
     # Calculate hat matrix diagonal elements
-    s1 = fitted(reshape(x1[i, :], 1, :), model1)[1]
-    s2 = fitted(reshape(x2[i, :], 1, :), model2_i)[1]
+    s1 = fitted(x1[i:i, :], model1)[1]
+    s2 = fitted(x2[i:i, :], model2_i)[1]
     hii[i] = s1 + s2
   end
   return sum(hii)

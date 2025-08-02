@@ -2,9 +2,11 @@ module MixedGWR
 
 using LinearAlgebra
 using Statistics
+using Base.Threads
 
 
 include("kernel.jl")
+include("gw_weight.jl")
 include("gwr_q.jl")
 include("gwr_mixed.jl")
 include("gwr_mixed_trace.jl")

@@ -16,17 +16,20 @@ function gw_reg(x::Matrix{Float64}, y::Vector{Float64}, w::Vector{Float64})::Mat
   return reshape(beta, 1, :)  # Return as row vector
 end
 
-
 "GWR with specified distance matrix"
-function gwr_q(x::Matrix{Float64}, y::Vector{Float64},
-  dMat::Matrix{Float64}, bw::Float64, kernel::Int, adaptive::Bool=false)::Matrix{Float64}
-  n = size(dMat, 2)
-  m = size(x, 2)
-  β = zeros(Float64, n, m)
+function gwr_q(x::Matrix{T}, y::Vector{T}, dMat::AbstractMatrix{T}, bw::T;
+  kernel::Int, adaptive::Bool=false)::Matrix{T} where {T<:Real}
 
-  for i in 1:n
+  N = size(x, 1)    # observations
+  w = zeros(T, N)
+
+  m = size(x, 2)    # n_local variables
+  n = size(dMat, 2)
+  β = zeros(T, n, m)
+
+  @inbounds for i in 1:n
     distv = dMat[:, i]
-    w = gw_weight(distv, bw, kernel, adaptive)
+    gw_weight!(w, distv, bw; kernel, adaptive)
     β[i, :] = gw_reg(x, y, w)
   end
   return β
