@@ -3,27 +3,41 @@ using Ipaper
 
 
 
+begin
+  model = MGWR(x1, x2, y, dMat; kernel=BISQUARE, adaptive=true, bw=20.0)
+  bandwidths = [3., 5.0, 8., 10., 15, 20.]
+
+  ## 需要结合kfold进行判断
+  @time info = map(bw -> begin
+      update_weight!(model; bw, kernel=BISQUARE, adaptive=true)
+      GWR_mixed(model)
+      s = summary(model)
+      
+      ypred = predict(model)
+      # ypred = fitted(x1, β1) + fitted(x2, β2)
+      # ypred = predict(model)
+      gof = GOF(y, ypred)
+      (; bw, s..., gof...)
+    end, bandwidths) |> DataFrame
+end
+
+
+
+# @time model = GWR_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
+
+
+
 ## 超参数优化
-@profview trace = gwr_mixed_trace(x1, x2, dMat, 20.0; kernel=BISQUARE, adaptive=true)
+# @profview trace = gwr_mixed_trace(x1, x2, dMat, 20.0; kernel=BISQUARE, adaptive=true)
 @time trace = gwr_mixed_trace(x1, x2, dMat, 20.0; kernel=BISQUARE, adaptive=true) # 5 times faster
 # @time trace_r = gwr_mixed_trace_r(x1, x2, y, dMat)
 
 
-@time model = GWR_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
-y_jl = predict(model, x1, x2)
+# y_jl = predict(model, x1, x2)
 # y_r = predict(model_r, x1, x2)
 ## 测试带宽的影响
 
-bandwidths = [3., 5.0, 8., 10., 15, 20.]
 
-## 需要结合kfold进行判断
-@time info = map(bw -> begin
-    model = GWR_mixed(x1, x2, y, dMat, dMat, bw; kernel=BISQUARE, adaptive=true)
-    ypred = predict(model, x1, x2)
-    gof = GOF(y, ypred)
-    (; bw, gof...)
-  end, bandwidths) |> DataFrame
-DataFrame(info)
 
 
 

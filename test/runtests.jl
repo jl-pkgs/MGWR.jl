@@ -3,21 +3,6 @@ include("main_pkgs.jl")
 model = MGWR(x1, x2, y, dMat; kernel=BISQUARE, adaptive=true, bw=20.0)
 
 
-
-@testset "GWR_mixed summary" begin
-  @time βs = GWR_mixed(model)
-  @test model.β1 == βs[:local]
-  @test model.β2 == βs[:global]
-  
-  ypred = predict(model)
-  @test cor(y, ypred) >= 0.85
-  
-  s = summary(model)
-  @test s.AIC ≈ 1312.0799214329443
-  @test s.σ ≈ 8.428717667622848
-end
-
-
 @testset "GWR" begin
   for adaptive in [true, false]
     for kernel in 0:4
@@ -26,6 +11,16 @@ end
       @test r ≈ jl
     end
   end
+end
+
+
+@testset "GWR_calib" begin
+  β = GWR(model)
+  res = GWR_calib(model)
+  β2 = res.β
+  β ≈ β2
+  res.trace ≈ 29.296714491744776
+  res.AIC ≈ 1308.7723907048241
 end
 
 
@@ -38,6 +33,20 @@ end
   @test res1 == res2
   @test res_r[:local] ≈ res1[:local]
   @test res_r[:global] ≈ res1[:global]
+end
+
+
+@testset "GWR_mixed summary" begin
+  @time βs = GWR_mixed(model)
+  @test model.β1 == βs[:local]
+  @test model.β2 == βs[:global]
+
+  ypred = predict(model)
+  @test cor(y, ypred) >= 0.85
+
+  s = summary(model)
+  @test s.AIC ≈ 1312.0799214329443
+  @test s.σ ≈ 8.428717667622848
 end
 
 

@@ -6,7 +6,7 @@ using Base.Threads
 import Base.summary
 # using Polyester: @batch
 
-export MGWR
+export MGWR, update_weight!
 export GWR_mixed, GWR_mixed_trace, gwr_q, gw_weight_vec, gw_reg, fitted
 export fitted, predict, summary
 

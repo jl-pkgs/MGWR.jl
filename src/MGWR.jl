@@ -27,6 +27,23 @@ using Parameters
 end
 
 
+function update_weight!(model::MGWR{T};
+  bw::T=5.0, kernel::Int=0, adaptive::Bool=false) where {T}
+
+  (; dMat, dMat_rp,
+    wMat, wMat_ols, wMat_rp, wMat_rp_ols) = model
+  # 几个权重都可以进行计算了
+  kernel_ols = BOXCAR
+  bw_ols = 100000.0
+
+  wMat .= gw_weight(dMat, bw; kernel, adaptive)
+  wMat_ols .= gw_weight(dMat, bw_ols; kernel=kernel_ols, adaptive=true)
+  wMat_rp .= gw_weight(dMat_rp, bw; kernel, adaptive)
+  wMat_rp_ols .= gw_weight(dMat_rp, bw_ols; kernel=kernel_ols, adaptive=true)
+  return model
+end
+
+
 function MGWR(x1::Matrix{T}, x2::Matrix{T}, y::Vector{T}, dMat::Matrix{T}, dMat_rp::Matrix{T}=dMat;
   bw=5.0, kernel=0, adaptive::Bool=false) where {T}
 
@@ -34,21 +51,13 @@ function MGWR(x1::Matrix{T}, x2::Matrix{T}, y::Vector{T}, dMat::Matrix{T}, dMat_
   p_local = size(x1, 2)
   p_global = size(x2, 2)
 
-  # 几个权重都可以进行计算了
-  kernel_ols = BOXCAR
-  bw_ols = 100000.0
-
-  wMat = gw_weight(dMat, bw; kernel, adaptive)
-  wMat_ols = gw_weight(dMat, bw_ols; kernel=kernel_ols, adaptive=true)
-  wMat_rp = gw_weight(dMat_rp, bw; kernel, adaptive)
-  wMat_rp_ols = gw_weight(dMat_rp, bw_ols; kernel=kernel_ols, adaptive=true)
-
-  MGWR{T}(;
+  model = MGWR{T}(;
     n_control, n_target, p_local, p_global,
     x1, x2, y, dMat, dMat_rp,
-    wMat, wMat_ols, wMat_rp, wMat_rp_ols,
+    # wMat, wMat_ols, wMat_rp, wMat_rp_ols,
     bw, kernel, adaptive
   )
+  update_weight!(model; bw, kernel, adaptive)
 end
 
 
@@ -73,9 +82,15 @@ function summary(model::MGWR)
   ϵ = y - ypred
   RSS = sum(ϵ .^ 2)
   RMSE = sqrt(RSS / n)
-  σ = sqrt(RSS / (n - tr))
+  
+  σ = safe_sqrt(RSS / (n - tr))
   r = cor(y, ypred)
 
-  AIC = (log(RSS / (n - tr)) + log(2pi) + (n + tr) / (n - 2 - tr)) * n # Li 2019, Eq. 16
+  AIC = (safe_log(RSS / (n - tr)) + log(2pi) + (n + tr) / (n - 2 - tr)) * n # Li 2019, Eq. 16
   return (; n, r, RSS, RMSE, σ, trace=tr, AIC)
 end
+
+
+safe_sqrt(x::T) where {T<:Real} = x < 0 ? T(NaN) : sqrt(x)
+
+safe_log(x::T) where {T<:Real} = x < 0 ? T(NaN) : log(x)

@@ -39,6 +39,7 @@ function GWR_mixed(x1::Matrix{T}, x2::Matrix{T}, y::Vector{T},
   # Step 5: Final global coefficients
   β_global = GWR(x3, y2, wMat_rp_ols)  # Final global fit
   (; :local => β_local, :global => β_global)
+  # return β_local, β_global
 end
 
 
@@ -67,5 +68,6 @@ function GWR_mixed(model::MGWR{T}) where {T}
 
   model.β1 .= β_local
   model.β2 .= β_global
+  # return β_local, β_global
   (; :local => β_local, :global => β_global)
 end
