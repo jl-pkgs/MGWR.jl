@@ -5,7 +5,7 @@ using Parameters
   n_control::Int = 100
   n_target::Int = 10
   p_local::Int = 2
-  p_global::Int = 2
+  p_global::Int = 0
 
   x1::Matrix{T} = zeros(T, n_control, p_local)         # [n_control, p_local], local
   x2::Matrix{T} = zeros(T, n_control, p_global)        # [n_control, p_global], global
@@ -67,7 +67,7 @@ function summary(model::MGWR)
   (; y) = model
   n = length(y)
 
-  tr = gwr_mixed_trace(model)
+  tr = GWR_mixed_trace(model)
   ypred = predict(model)
 
   ϵ = y - ypred

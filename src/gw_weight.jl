@@ -21,11 +21,11 @@ function gw_weight!(wv::AbstractVector{T}, vdist::AbstractVector{T}, bw::T;
   return wv
 end
 
-function gw_weight(vdist::AbstractVector{T}, bw::T;
-  kernel::Int=0, adaptive::Bool=true) where {T<:Real}
-  wv = zeros(T, size(vdist))
-  gw_weight!(wv, vdist, bw; kernel, adaptive)
-end
+# function gw_weight(vdist::AbstractVector{T}, bw::T;
+#   kernel::Int=0, adaptive::Bool=true) where {T<:Real}
+#   wv = zeros(T, size(vdist))
+#   gw_weight!(wv, vdist, bw; kernel, adaptive)
+# end
 
 
 ## 二维数据

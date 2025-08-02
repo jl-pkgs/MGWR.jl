@@ -9,7 +9,7 @@ end
 """
 Calculate trace of hat matrix for Mixed GWR (for effective degrees of freedom)
 """
-function gwr_mixed_trace(x1::Matrix{T}, x2::Matrix{T}, dMat::Matrix{T}, bw::T;
+function GWR_mixed_trace(x1::Matrix{T}, x2::Matrix{T}, dMat::Matrix{T}, bw::T;
   kernel::Int=0, adaptive::Bool=false)::T where {T}
 
   n_control = size(x1, 1)
@@ -23,8 +23,8 @@ function gwr_mixed_trace(x1::Matrix{T}, x2::Matrix{T}, dMat::Matrix{T}, bw::T;
 
   # Step 1: Orthogonalize global variables (same as in gwr_mixed_2)
   for i in 1:p_global
-    # β = gwr_q(x1, x2[:, i], dMat, bw; kernel, adaptive) # [n_control, k_local]
-    β = gwr_q(x1, x2[:, i], wMat) # [n_control, k_local]
+    # β = GWR(x1, x2[:, i], dMat, bw; kernel, adaptive) # [n_control, k_local]
+    β = GWR(x1, x2[:, i], wMat) # [n_control, k_local]
     x3[:, i] = x2[:, i] - fitted(x1, β) # [n_control, 1], global - local_effect
   end
 
@@ -38,16 +38,16 @@ function gwr_mixed_trace(x1::Matrix{T}, x2::Matrix{T}, dMat::Matrix{T}, bw::T;
     ei = e_vec(i, n_control)
 
     # Regression of unit vector on local variables
-    β = gwr_q(x1, ei, wMat) # [n_control, k_local]
+    β = GWR(x1, ei, wMat) # [n_control, k_local]
     y2 = ei - fitted(x1, β) # [n_control, 1]
 
     # Global regression
-    β2 = gwr_q(x3, y2, wMat_ols)
+    β2 = GWR(x3, y2, wMat_ols)
     y3 = ei - fitted(x2, β2)
 
     # Local regression at position i only
-    β1 = gwr_q(x1, y3, wMat[:, i:i])
-    β2_i = gwr_q(x3, y2, wMat_ols[:, i:i])
+    β1 = GWR(x1, y3, wMat[:, i:i])
+    β2_i = GWR(x3, y2, wMat_ols[:, i:i])
 
     # Calculate hat matrix diagonal elements
     s1 = fitted(x1[i:i, :], β1)[1]
@@ -58,13 +58,13 @@ function gwr_mixed_trace(x1::Matrix{T}, x2::Matrix{T}, dMat::Matrix{T}, bw::T;
 end
 
 
-function gwr_mixed_trace(model::MGWR{T}) where {T}
+function GWR_mixed_trace(model::MGWR{T}) where {T}
   (; x1, x2, x3, p_global, n_control, wMat, wMat_ols) = model
   x3 .= T(0)
   
   # Step 1: Orthogonalize global variables (same as in gwr_mixed_2)
   for i in 1:p_global
-    β = gwr_q(x1, x2[:, i], wMat) # [n_control, k_local]
+    β = GWR(x1, x2[:, i], wMat) # [n_control, k_local]
     x3[:, i] = x2[:, i] - fitted(x1, β) # [n_control, 1], global - local_effect
   end
 
@@ -76,16 +76,16 @@ function gwr_mixed_trace(model::MGWR{T}) where {T}
     ei = e_vec(i, n_control) # unit vector for position i
 
     # Regression of unit vector on local variables
-    β = gwr_q(x1, ei, wMat) # [n_control, k_local]
+    β = GWR(x1, ei, wMat) # [n_control, k_local]
     y2 = ei - fitted(x1, β) # [n_control, 1]
 
     # Global regression
-    β2 = gwr_q(x3, y2, wMat_ols)
+    β2 = GWR(x3, y2, wMat_ols)
     y3 = ei - fitted(x2, β2)
 
     # Local regression at position i only
-    β1 = gwr_q(x1, y3, wMat[:, i:i])
-    β2_i = gwr_q(x3, y2, wMat_ols[:, i:i])
+    β1 = GWR(x1, y3, wMat[:, i:i])
+    β2_i = GWR(x3, y2, wMat_ols[:, i:i])
 
     # Calculate hat matrix diagonal elements
     s1 = fitted(x1[i:i, :], β1)[1]

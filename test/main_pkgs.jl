@@ -5,11 +5,11 @@ library(GWmodel)
 """
 
 
-function gwr_mixed_r(x1, x2, y, dMat; kernel=BISQUARE)
+function GWR_mixed_r(x1, x2, y, dMat; kernel=BISQUARE)
   R"GWmodel:::gwr_mixed_2($x1, $x2, $y, $dMat, $dMat, 20.0, $kernel+1, TRUE)" |> rcopy
 end
 
-function gwr_mixed_trace_r(x1, x2, y, dMat; kernel=BISQUARE)
+function GWR_mixed_trace_r(x1, x2, y, dMat; kernel=BISQUARE)
   R"GWmodel:::gwr_mixed_trace($x1, $x2, $y, $dMat, 20.0, $kernel+1, TRUE)" |> rcopy
 end
 

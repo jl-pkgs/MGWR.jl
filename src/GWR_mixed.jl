@@ -5,7 +5,7 @@ Mixed GWR implementation
 - `dMat`   : with the dimension of [n_control, n_control]
 - `dMat_rp`: with the dimension of [n_control, n_target]
 """
-function gwr_mixed(x1::Matrix{T}, x2::Matrix{T}, y::Vector{T},
+function GWR_mixed(x1::Matrix{T}, x2::Matrix{T}, y::Vector{T},
   dMat::Matrix{T}, dMat_rp::Matrix{T}, bw::T;
   kernel::Int=0, adaptive::Bool=false) where {T<:Real}
 
@@ -22,48 +22,48 @@ function gwr_mixed(x1::Matrix{T}, x2::Matrix{T}, y::Vector{T},
   # Step 1: Orthogonalize global variables (calculate x3)
   x3 = zeros(T, n_control, p_global)
   @inbounds for i in 1:p_global
-    β = gwr_q(x1, x2[:, i], wMat)
+    β = GWR(x1, x2[:, i], wMat)
     x3[:, i] = x2[:, i] - fitted(x1, β)
   end
 
   # Step 2: Fit local part and get residuals
-  β = gwr_q(x1, y, wMat)  # Fit local
+  β = GWR(x1, y, wMat)  # Fit local
   y2 = y - fitted(x1, β)                        # y - local = global
 
   # Step 3: Fit global coefficients (first time)
-  β_global = gwr_q(x3, y2, wMat_ols)  # Fit global
+  β_global = GWR(x3, y2, wMat_ols)  # Fit global
 
   # Step 4: Re-fit local coefficients removing global effects
-  β_local = gwr_q(x1, y - fitted(x2, β_global), wMat_rp)  # Remove global, fit local
+  β_local = GWR(x1, y - fitted(x2, β_global), wMat_rp)  # Remove global, fit local
 
   # Step 5: Final global coefficients
-  β_global = gwr_q(x3, y2, wMat_rp_ols)  # Final global fit
+  β_global = GWR(x3, y2, wMat_rp_ols)  # Final global fit
   (; :local => β_local, :global => β_global)
 end
 
 
-function gwr_mixed(model::MGWR{T}) where {T}
+function GWR_mixed(model::MGWR{T}) where {T}
   (; x1, x2, x3, y, wMat, wMat_ols, wMat_rp, wMat_rp_ols, n_control, p_global) = model
   x3 .= T(0)
   # Step 1: Orthogonalize global variables (calculate x3)
   x3 = zeros(T, n_control, p_global)
   @inbounds for i in 1:p_global
-    β = gwr_q(x1, x2[:, i], wMat)
+    β = GWR(x1, x2[:, i], wMat)
     x3[:, i] = x2[:, i] - fitted(x1, β)
   end
 
   # Step 2: Fit local part and get residuals
-  β = gwr_q(x1, y, wMat)  # Fit local
+  β = GWR(x1, y, wMat)  # Fit local
   y2 = y - fitted(x1, β)                        # y - local = global
 
   # Step 3: Fit global coefficients (first time)
-  β_global = gwr_q(x3, y2, wMat_ols)  # Fit global
+  β_global = GWR(x3, y2, wMat_ols)  # Fit global
 
   # Step 4: Re-fit local coefficients removing global effects
-  β_local = gwr_q(x1, y - fitted(x2, β_global), wMat_rp)  # Remove global, fit local
+  β_local = GWR(x1, y - fitted(x2, β_global), wMat_rp)  # Remove global, fit local
 
   # Step 5: Final global coefficients
-  β_global = gwr_q(x3, y2, wMat_rp_ols)  # Final global fit
+  β_global = GWR(x3, y2, wMat_rp_ols)  # Final global fit
 
   model.β1 .= β_local
   model.β2 .= β_global

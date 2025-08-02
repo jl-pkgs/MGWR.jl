@@ -9,7 +9,7 @@ using Ipaper
 # @time trace_r = gwr_mixed_trace_r(x1, x2, y, dMat)
 
 
-@time model = gwr_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
+@time model = GWR_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
 y_jl = predict(model, x1, x2)
 # y_r = predict(model_r, x1, x2)
 ## 测试带宽的影响
@@ -18,7 +18,7 @@ bandwidths = [3., 5.0, 8., 10., 15, 20.]
 
 ## 需要结合kfold进行判断
 @time info = map(bw -> begin
-    model = gwr_mixed(x1, x2, y, dMat, dMat, bw; kernel=BISQUARE, adaptive=true)
+    model = GWR_mixed(x1, x2, y, dMat, dMat, bw; kernel=BISQUARE, adaptive=true)
     ypred = predict(model, x1, x2)
     gof = GOF(y, ypred)
     (; bw, gof...)
@@ -30,7 +30,7 @@ DataFrame(info)
 
 # summary
 begin
-  model = gwr_mixed(x1, x2, y, dMat, dMat, bw; kernel, adaptive)
+  model = GWR_mixed(x1, x2, y, dMat, dMat, bw; kernel, adaptive)
   ypred = predict(model, x1, x2)
   ϵ = y - ypred
   RSS = sum(ϵ .^ 2)
