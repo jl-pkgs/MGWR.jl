@@ -1,4 +1,10 @@
-"Mixed GWR implementation"
+"""
+Mixed GWR implementation
+
+# Arguments
+- `dMat`   : with the dimension of [n_control, n_control]
+- `dMat_rp`: with the dimension of [n_control, n_target]
+"""
 function gwr_mixed(x1::Matrix{Float64}, x2::Matrix{Float64}, y::Vector{Float64},
   dMat::Matrix{Float64}, dMat_rp::Matrix{Float64}, bw::Float64;
   kernel::Int=0, adaptive::Bool=false)

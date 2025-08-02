@@ -14,8 +14,8 @@ end
 
 
 @testset "gwr_mixed" begin
-  model_r = gwr_mixed_r(x1, x2, y, dMat)
-  model = gwr_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
+  @time model_r = gwr_mixed_r(x1, x2, y, dMat)
+  @time model = gwr_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
 
   @test model_r[:local] ≈ model[:local]
   @test model_r[:global] ≈ model[:global]

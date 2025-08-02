@@ -23,8 +23,28 @@ end
 
 function gw_weight(vdist::AbstractVector{T}, bw::T;
   kernel::Int=0, adaptive::Bool=true) where {T<:Real}
-  wv = zeros(T, length(vdist))
+  wv = zeros(T, size(vdist))
   gw_weight!(wv, vdist, bw; kernel, adaptive)
+end
+
+
+## 二维数据
+function gw_weight!(ws::AbstractMatrix{T}, dist::AbstractMatrix{T}, bw::T;
+  kernel::Int=0, adaptive::Bool=true) where {T<:Real}
+  n_control, n_target = size(dist)
+  
+  @inbounds for j in 1:n_target
+    _w = @view ws[:, j]
+    _dist = @view dist[:, j]
+    gw_weight!(_w, _dist, bw; kernel, adaptive)
+  end
+  return ws
+end
+
+
+function gw_weight(dist::AbstractMatrix{T}, bw::T; kernel::Int=0, adaptive::Bool=true) where {T<:Real}
+  wMat = zeros(T, size(dist))
+  gw_weight!(wMat, dist, bw; kernel, adaptive)
 end
 
 
