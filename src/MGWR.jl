@@ -7,8 +7,9 @@ using Parameters
   p_local::Int = 2
   p_global::Int = 2
 
-  x1::Matrix{T} = zeros(T, n_control, p_local)         # [n_control, p_local]
-  x2::Matrix{T} = zeros(T, n_control, p_global)        # [n_control, p_global]
+  x1::Matrix{T} = zeros(T, n_control, p_local)         # [n_control, p_local], local
+  x2::Matrix{T} = zeros(T, n_control, p_global)        # [n_control, p_global], global
+  x3::Matrix{T} = zeros(T, n_control, p_global)        # [n_control, p_global], intermediate, global - local_effect
   y::Vector{T} = zeros(T, n_control)                   # [n_control]
   dMat::Matrix{T} = zeros(T, n_control, n_control)     # [n_control, n_control]
   dMat_rp::Matrix{T} = zeros(T, n_control, n_target)   # [n_control, n_target]
@@ -35,10 +36,12 @@ function MGWR(x1::Matrix{T}, x2::Matrix{T}, y::Vector{T}, dMat::Matrix{T}, dMat_
 
   # 几个权重都可以进行计算了
   kernel_ols = BOXCAR
+  bw_ols = 100000.0
+
   wMat = gw_weight(dMat, bw; kernel, adaptive)
-  wMat_ols = gw_weight(dMat, bw; kernel=kernel_ols, adaptive=true)
+  wMat_ols = gw_weight(dMat, bw_ols; kernel=kernel_ols, adaptive=true)
   wMat_rp = gw_weight(dMat_rp, bw; kernel, adaptive)
-  wMat_rp_ols = gw_weight(dMat_rp, bw; kernel=kernel_ols, adaptive=true)
+  wMat_rp_ols = gw_weight(dMat_rp, bw_ols; kernel=kernel_ols, adaptive=true)
 
   MGWR{T}(;
     n_control, n_target, p_local, p_global,
@@ -61,12 +64,18 @@ function predict(model::MGWR)
 end
 
 function summary(model::MGWR)
+  (; y) = model
+  n = length(y)
+
+  tr = gwr_mixed_trace(model)
   ypred = predict(model)
-  n = length(ypred)
 
   ϵ = y - ypred
   RSS = sum(ϵ .^ 2)
-  tr = gwr_mixed_trace(model)
-  AIC = (ln(RSS / (n - tr)) + ln(2pi) + (n + tr) / (n - 2 - tr)) * n # Li 2019, Eq. 16
-  return AIC
+  RMSE = sqrt(RSS / n)
+  σ = sqrt(RSS / (n - tr))
+  r = cor(y, ypred)
+
+  AIC = (log(RSS / (n - tr)) + log(2pi) + (n + tr) / (n - 2 - tr)) * n # Li 2019, Eq. 16
+  return (; n, r, RSS, RMSE, σ, trace=tr, AIC)
 end

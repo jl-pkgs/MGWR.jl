@@ -1,9 +1,20 @@
 using MixedGWR, RTableTools, Distances, Test
 include("main_pkgs.jl")
 
+model = MGWR(x1, x2, y, dMat; kernel=BISQUARE, adaptive=true, bw=20.0)
 
-@testset "MGWR" begin
-  @test_nowarn @time model = MGWR(x1, x2, y, dMat)
+
+@testset "gwr_mixed summary" begin
+  @time βs = gwr_mixed(model)
+  @test model.β1 == βs[:local]
+  @test model.β2 == βs[:global]
+  
+  ypred = predict(model)
+  @test cor(y, ypred) >= 0.85
+  
+  s = summary(model)
+  @test s.AIC ≈ 1312.0799214329443
+  @test s.σ ≈ 8.428717667622848
 end
 
 
@@ -20,17 +31,22 @@ end
 
 # ~4 times faster
 @testset "gwr_mixed" begin
-  @time model_r = gwr_mixed_r(x1, x2, y, dMat)
-  @time model = gwr_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
+  @time res_r = gwr_mixed_r(x1, x2, y, dMat)
+  @time res1 = gwr_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
+  @time res2 = gwr_mixed(model)
 
-  @test model_r[:local] ≈ model[:local]
-  @test model_r[:global] ≈ model[:global]
+  @test res1 == res2
+  @test res_r[:local] ≈ res1[:local]
+  @test res_r[:global] ≈ res1[:global]
 end
 
 
 # ~30 times faster
 @testset "gwr_mixed_trace" begin
-  @time trace = gwr_mixed_trace(x1, x2, dMat, 20.0; kernel=BISQUARE, adaptive=true)
-  @time trace_r = gwr_mixed_trace_r(x1, x2, y, dMat)
-  @test trace ≈ trace_r
+  @time res1 = gwr_mixed_trace(x1, x2, dMat, 20.0; kernel=BISQUARE, adaptive=true)
+  @time res2 = gwr_mixed_trace(model)
+  @test res1 == res2
+
+  @time res_r = gwr_mixed_trace_r(x1, x2, y, dMat)
+  @test res1 ≈ res_r
 end

@@ -10,6 +10,7 @@ export MGWR
 export gwr_mixed, gwr_mixed_trace, gwr_q, gw_weight_vec, gw_reg, fitted
 export fitted, predict, summary
 
+export cor
 
 
 include("MGWR.jl")
