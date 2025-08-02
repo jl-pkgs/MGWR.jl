@@ -1,8 +1,10 @@
+export gwr_q
+
+
 "Geographically weighted regression for single location"
 function gw_reg(x::Matrix{T}, y::Vector{T}, w::AbstractVector{T})::Matrix{T} where {T<:Real}
-  # Create weighted design matrix
   w_sqrt = sqrt.(w)
-  xw = x .* w_sqrt
+  xw = x .* w_sqrt # 重新分配内存
   yw = y .* w_sqrt
 
   # Solve weighted least squares
@@ -24,7 +26,32 @@ GWR with specified distance matrix
 - `x`: control variables, [n_control, k_local]
 - `y`: response variable
 - `dMat`: distance matrix, [n_control, n_target]
+
+提前算好权重，进行加速
 """
+function gwr_q!(β::AbstractMatrix{T}, x::Matrix{T}, y::Vector{T}, wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}
+  k_local = size(x, 2)
+  n_target = size(wMat, 2)
+  # n_control = size(x, 1)
+  # β = zeros(T, n_target, k_local)
+  @inbounds for i in 1:n_target
+    w = @view wMat[:, i]
+    _β = gw_reg(x, y, w) # [1, k_local]
+    β[i, :] = _β
+  end
+  return β
+end
+
+
+function gwr_q(x::Matrix{T}, y::Vector{T}, wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}
+  n_target = size(wMat, 2)
+  k_local = size(x, 2)
+  β = zeros(T, n_target, k_local)
+  gwr_q!(β, x, y, wMat)
+end
+
+
+#! deprecated, low efficiency
 function gwr_q(x::Matrix{T}, y::Vector{T}, dMat::AbstractMatrix{T}, bw::T;
   kernel::Int, adaptive::Bool=false)::Matrix{T} where {T<:Real}
 
@@ -42,36 +69,3 @@ function gwr_q(x::Matrix{T}, y::Vector{T}, dMat::AbstractMatrix{T}, bw::T;
   end
   return β
 end
-
-
-## 提前算好权重，进行加速
-function gwr_q!(β::AbstractMatrix{T}, x::Matrix{T}, y::Vector{T}, wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}
-  k_local = size(x, 2)
-  n_target = size(wMat, 2)
-  # n_control = size(x, 1)
-  # β = zeros(T, n_target, k_local)
-  
-  @inbounds for i in 1:n_target
-    w = @view wMat[:, i]
-    # _β = gw_reg(x, y, w)
-    β[i, :] .= gw_reg(x, y, w)[:]
-  end
-  return β
-end
-
-
-function gwr_q(x::Matrix{T}, y::Vector{T}, wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}
-  n_target = size(wMat, 2)
-  k_local = size(x, 2)
-  β = zeros(T, n_target, k_local)
-  gwr_q!(β, x, y, wMat)
-end
-
-
-"Fitted values from coefficient matrix and design matrix"
-function fitted(x::Matrix{Float64}, β::Matrix{Float64})::Vector{Float64}
-  return vec(sum(x .* β, dims=2))
-end
-
-
-export gwr_q
