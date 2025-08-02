@@ -1,7 +1,7 @@
 using MixedGWR, RTableTools, Distances, Test
 using RCall
 R"""
-pacman::p_load(GWmodel)
+library(GWmodel)
 """
 
 
@@ -14,10 +14,10 @@ function gwr_mixed_trace_r(x1, x2, y, dMat; kernel=BISQUARE)
 end
 
 
-
 # load data
 begin
-  d = fread("data/prcp_st174_shiyan.csv")
+  indir = "$(@__DIR__)/.." |> abspath
+  d = fread("$indir/data/prcp_st174_shiyan.csv")
 
   coords = Matrix(d[:, [:lon, :lat]])
   points = map(x -> x, eachrow(coords))

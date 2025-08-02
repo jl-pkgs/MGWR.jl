@@ -2,7 +2,8 @@
 function gw_weight!(wv::AbstractVector{T}, vdist::AbstractVector{T}, bw::T;
   kernel::Int=0, adaptive::Bool=true) where {T<:Real}
 
-  kerf = GWR_KERNELS[kernel+1]  # Julia is 1-indexed
+  kerf::Function = GWR_KERNELS[kernel+1]  # Julia is 1-indexed
+  
   n = length(vdist)
   if adaptive
     dn = bw / n
@@ -14,8 +15,8 @@ function gw_weight!(wv::AbstractVector{T}, vdist::AbstractVector{T}, bw::T;
     end
   end
 
-  @inbounds for i in 1:n
-    wv[i] = kerf(vdist[i], bw)
+  for i in 1:n
+    @inbounds wv[i] = kerf(vdist[i], bw)
   end
   return wv
 end

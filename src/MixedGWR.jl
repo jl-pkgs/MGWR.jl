@@ -3,7 +3,7 @@ module MixedGWR
 using LinearAlgebra
 using Statistics
 using Base.Threads
-
+using Polyester: @batch
 
 include("kernel.jl")
 include("gw_weight.jl")
