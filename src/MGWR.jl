@@ -19,8 +19,8 @@ using Parameters
   wMat_rp::Matrix{T} = zeros(T, n_control, n_target)   # [n_control, n_target], intermediate
   wMat_rp_ols::Matrix{T} = zeros(T, n_control, n_target) # [n_control, n_target], intermediate
 
-  β1::Matrix{T} = zeros(T, n_control, p_local)         # [n_control, p_local]
-  β2::Matrix{T} = zeros(T, n_control, p_global)        # [n_control, p_global]
+  β1::Matrix{T} = zeros(T, n_target, p_local)         # [n_control, p_local]
+  β2::Matrix{T} = zeros(T, n_target, p_global)        # [n_control, p_global]
   bw::T = 5.0
   kernel::Int = 0
   adaptive::Bool = false
@@ -71,6 +71,19 @@ function predict(model::MGWR)
   (; x1, x2, β1, β2) = model
   return fitted(x1, β1) + fitted(x2, β2) # ypred
 end
+
+# GWR
+function predict(model::MGWR, x1::M) where {T<:Real,M<:AbstractMatrix{T}}
+  (; β1) = model
+  return fitted(x1, β1)
+end
+
+# MGWR
+function predict(model::MGWR, x1::M, x2::M) where {T<:Real, M<:AbstractMatrix{T}}
+  (; β1, β2) = model
+  return fitted(x1, β1) + fitted(x2, β2) # ypred
+end
+
 
 function summary(model::MGWR)
   (; y) = model

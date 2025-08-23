@@ -24,6 +24,7 @@ end
 end
 
 
+# x1: local, x2: global
 # ~4 times faster
 @testset "GWR_mixed" begin
   @time res_r = GWR_mixed_r(x1, x2, y, dMat)

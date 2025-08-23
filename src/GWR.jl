@@ -71,8 +71,8 @@ function GWR(x::Matrix{T}, y::Vector{T}, wMat::AbstractMatrix{T})::Matrix{T} whe
 end
 
 function GWR(model::MGWR)
-  (; x1, y, wMat) = model
-  GWR(x1, y, wMat)
+  (; x1, y, wMat_rp) = model
+  GWR(x1, y, wMat_rp)
 end
 
 #! deprecated, low efficiency
