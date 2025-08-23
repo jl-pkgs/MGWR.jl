@@ -48,14 +48,14 @@ GWR with specified distance matrix
 
 提前算好权重，进行加速
 """
-function GWR!(β::AbstractMatrix{T}, x::Matrix{T}, y::Vector{T}, wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}
-  k_local = size(x, 2)
+function GWR!(β::AbstractMatrix{T}, X::Matrix{T}, y::Vector{T}, wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}
+  k_local = size(X, 2)
   n_target = size(wMat, 2)
   # n_control = size(x, 1)
   # β = zeros(T, n_target, k_local)
   @inbounds for i in 1:n_target
     w = @view wMat[:, i]
-    _β = gw_reg(x, y, w) # [1, k_local]
+    _β = gw_reg(X, y, w) # [1, k_local]
     β[i, :] = _β
   end
   return β
