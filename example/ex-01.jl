@@ -1,5 +1,5 @@
-using MixedGWR, RTableTools, Distances, Test
-using SpatRasters, ArchGDAL
+using MixedGWR, RTableTools, Test
+using SpatRasters, Distances, ArchGDAL
 
 Base.Matrix(x::AbstractVector) = reshape(x, length(x), 1)
 
@@ -43,7 +43,7 @@ y_GWR = fitted(X1, β)
 y_MGWR = fitted(X1, β1) + fitted(Matrix(X2), β2)
 
 model = MGWR(x, x2, y, dMat, dMat_rp; kernel=BISQUARE, adaptive=true, bw=20.0)
-β = GWR(model)
+@time β = GWR(model)
 y_GWR2 = fitted(X, β)
 
 

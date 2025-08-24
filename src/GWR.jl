@@ -1,9 +1,29 @@
 export GWR
 export GWR_calib
+export gw_reg, gw_reg2
+
+
+"""
+    gw_reg2(X::Matrix{T}, y::Vector{T}, w::AbstractVector{T})
+
+β = C_i y = [(X' W_i X)⁻¹ X' W_i] y
+̂y = S y = x_i C_i y
+"""
+function gw_reg2(X::AbstractMatrix{T}, y::AbstractVector{T}, w::AbstractVector{T}) where {T<:Real}
+  XtW = (X .* w)'
+  XtWx = XtW * X
+  XtWy = X' * (w .* y)
+
+  XtWx_inv = inv(XtWx)
+  βᵢ = XtWx_inv * XtWy  # Li 2019, Eq. 9
+  Cᵢ = XtWx_inv * XtW   # Li 2019, Eq. 10
+  return βᵢ, Cᵢ
+end
+
 
 
 "Geographically weighted regression for single location"
-function gw_reg(X::Matrix{T}, y::Vector{T}, w::AbstractVector{T})::Matrix{T} where {T<:Real}
+function gw_reg(X::AbstractMatrix{T}, y::AbstractVector{T}, w::AbstractVector{T})::Matrix{T} where {T<:Real}
   w_sqrt = sqrt.(w)
   xw = X .* w_sqrt # 重新分配内存
   yw = y .* w_sqrt
@@ -18,25 +38,6 @@ function gw_reg(X::Matrix{T}, y::Vector{T}, w::AbstractVector{T})::Matrix{T} whe
   end
   return reshape(β, 1, :)  # Return as row vector
 end
-
-
-"""
-    gw_reg2(X::Matrix{T}, y::Vector{T}, w::AbstractVector{T})
-
-β = C_i y = [(X' W_i X)⁻¹ X' W_i] y
-̂y = S y = x_i C_i y
-"""
-function gw_reg2(X::Matrix{T}, y::Vector{T}, w::AbstractVector{T}) where {T<:Real}
-  XtW = (X .* w)'
-  XtWx = XtW * X
-  XtWy = X' * (w .* y)
-
-  XtWx_inv = inv(XtWx)
-  βᵢ = XtWx_inv * XtWy  # Li 2019, Eq. 9
-  Cᵢ = XtWx_inv * XtW   # Li 2019, Eq. 10
-  return βᵢ, Cᵢ
-end
-
 
 """
 GWR with specified distance matrix
@@ -60,7 +61,6 @@ function GWR!(β::AbstractMatrix{T}, X::Matrix{T}, y::Vector{T}, wMat::AbstractM
   end
   return β
 end
-
 
 
 function GWR(x::Matrix{T}, y::Vector{T}, wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}

@@ -17,6 +17,8 @@ include("MGWR.jl")
 include("kernel.jl")
 include("gw_weight.jl")
 include("GWR.jl")
+include("GWR_fast.jl")
+
 include("GWR_mixed.jl")
 include("GWR_mixed_trace.jl")
 
