@@ -53,7 +53,7 @@ function GWR!(β::AbstractMatrix{T}, X::Matrix{T}, y::Vector{T}, wMat::AbstractM
   n_target = size(wMat, 2)
   # n_control = size(x, 1)
   # β = zeros(T, n_target, k_local)
-  @inbounds for i in 1:n_target
+  @inbounds @threads for i in 1:n_target
     w = @view wMat[:, i]
     _β = gw_reg(X, y, w) # [1, k_local]
     β[i, :] = _β

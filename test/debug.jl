@@ -2,7 +2,6 @@ using HydroTools, DataFrames
 using Ipaper
 
 
-
 begin
   model = MGWR(x1, x2, y, dMat; kernel=BISQUARE, adaptive=true, bw=20.0)
   bandwidths = [3., 5.0, 8., 10., 15, 20.]
@@ -21,26 +20,15 @@ begin
     end, bandwidths) |> DataFrame
 end
 
-
-
 # @time model = GWR_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
-
-
-
 ## 超参数优化
 # @profview trace = gwr_mixed_trace(x1, x2, dMat, 20.0; kernel=BISQUARE, adaptive=true)
 @time trace = gwr_mixed_trace(x1, x2, dMat, 20.0; kernel=BISQUARE, adaptive=true) # 5 times faster
 # @time trace_r = gwr_mixed_trace_r(x1, x2, y, dMat)
 
-
 # y_jl = predict(model, x1, x2)
 # y_r = predict(model_r, x1, x2)
 ## 测试带宽的影响
-
-
-
-
-
 
 # summary
 begin
@@ -53,8 +41,6 @@ begin
   n = length(y)
   AIC = (ln(RSS / (n - tr)) + ln(2pi) + (n + tr) / (n - 2 - tr)) * n
 end
-
-
 
 # r.ss <- sum((y - gw_fitted(model2$global, x2) - gw_fitted(model2$local, x1))^2)
 # n1 <- length(y)  

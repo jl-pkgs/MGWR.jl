@@ -7,10 +7,6 @@
 
 > Translated from R package GWmodel
 
-```bash
-# 厘清 x_in, x_out
-```
-
 ## References
 
 1. <https://github.com/GWmodel-Lab/GWmodel>
