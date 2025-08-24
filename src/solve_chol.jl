@@ -32,7 +32,7 @@ end
 """
 function solve_chol!(
   β::AbstractMatrix{T}, WY::AbstractMatrix{T}, XtWY::AbstractMatrix{T},
-  X::AbstractMatrix{T}, w::AbstractVector{T}, Y::AbstractMatrix{T};
+  X::AbstractMatrix{T}, Y::AbstractMatrix{T}, w::AbstractVector{T};
   λ::T=T(1e-8)) where {T<:Real}
   n_control, p = size(X)
   _, ntime = size(Y)
@@ -56,16 +56,19 @@ function solve_chol!(
 end
 
 
-function solve_chol!(solver::GWRSolver{T}, 
-  X::AbstractMatrix{T}, w::AbstractVector{T}, Y::AbstractMatrix{T};
+function solve_chol!(solver::GWRSolver{T},
+  X::AbstractMatrix{T}, Y::AbstractMatrix{T}, w::AbstractVector{T};
   λ::T=T(1e-8)) where {T<:Real}
   (; β, WY, XtWY) = solver
-  solve_chol!(β, WY, XtWY, X, w, Y; λ)
+  solve_chol!(β, WY, XtWY, X, Y, w; λ)
 end
 
 
 function solve_chol(
-  X::AbstractMatrix{T}, w::AbstractVector{T}, Y::AbstractMatrix{T}; λ::T=T(1e-8)) where {T<:Real}
+  X::AbstractMatrix{T}, Y::AbstractMatrix{T}, w::AbstractVector{T}; λ::T=T(1e-8)) where {T<:Real}
   solver = GWRSolver(X, Y)
-  solve_chol!(solver, X, w, Y; λ)
+  solve_chol!(solver, X, Y, w; λ)
 end
+
+solve_chol(X::AbstractMatrix{T}, y::AbstractVector{T}, w::AbstractVector{T}) where {T<:Real} =
+  solve_chol(X, Matrix(y), w)

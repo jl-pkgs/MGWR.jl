@@ -7,7 +7,7 @@ import Base.summary
 # using Polyester: @batch
 
 export MGWR, update_weight!
-export GWR_mixed, GWR_mixed_trace, gwr_q, gw_weight_vec, gw_reg, fitted
+export GWR_mixed, GWR_mixed_trace, gwr_q, gw_weight_vec, solver_reg, fitted
 export fitted, predict, summary
 
 export cor
@@ -16,8 +16,10 @@ export cor
 include("MGWR.jl")
 include("kernel.jl")
 include("gw_weight.jl")
+include("solve_chol.jl")
+include("solve_reg.jl")
 include("GWR.jl")
-include("GWR_fast.jl")
+include("GWR_calib.jl")
 
 include("GWR_mixed.jl")
 include("GWR_mixed_trace.jl")
