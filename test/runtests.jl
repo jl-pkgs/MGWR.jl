@@ -5,8 +5,12 @@ include("main_pkgs.jl")
 model = MGWR(x1, x2, y, dMat; kernel=BISQUARE, adaptive=true, bw=20.0)
 
 # 加权线性回归 求解方法
-w = dMat[1, :]
-@test gw_reg2(x1, y, w)[1] ≈ gw_reg(x1, y, w)[:]
+@testset "solver" begin
+  w = dMat[1, :]
+  β = gw_reg(x1, y, w)[:]
+  @test gw_reg2(x1, y, w)[1] ≈ β
+  @test solve_chol(x1, w, reshape(y, :, 1))[:] ≈ β
+end
 
 
 @testset "GWR" begin
