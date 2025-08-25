@@ -8,7 +8,7 @@ import Base.summary
 
 export MGWR, update_weight!
 export GWR_mixed, GWR_mixed_trace, gwr_q, gw_weight_vec, solver_reg, fitted
-export fitted, predict, summary
+export fitted, fitted!, predict, summary
 
 export cor
 

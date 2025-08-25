@@ -62,10 +62,21 @@ end
 
 
 "Fitted values from coefficient matrix and design matrix"
-function fitted(x::Matrix{Float64}, β::Matrix{Float64})::Vector{Float64}
-  return vec(sum(x .* β, dims=2))
+function fitted!(R::AbstractVector{T}, 
+  x::AbstractMatrix{T}, β::AbstractMatrix{T}) where {T<:Real}
+  n, p = size(x)
+  @turbo for i in 1:n
+    ∑ = zero(T)
+    for j in 1:p
+      ∑ += x[i, j] * β[i, j]
+    end
+    R[i] = ∑
+  end
+  return R
 end
 
+fitted(x::AbstractMatrix{T}, β::AbstractMatrix{T}) where {T<:Real} = 
+  fitted!(zeros(T, size(x, 1)), x, β)
 
 function predict(model::MGWR)
   (; x1, x2, β1, β2) = model
