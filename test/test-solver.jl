@@ -1,0 +1,29 @@
+# using BenchmarkTools
+@testset "solver matrix: Y" begin
+  w = dMat[:, 1]
+  ntime = 100
+  Y = rand(length(y), ntime)
+
+  # @time β1 = solve_chol(x1, w, Y)
+  solver = GWRSolver(x1, Y)
+  @time β = solve_chol!(solver, x1, Y, w)
+  @time β1 = solve_reg(x1, Y, w)
+  @time β2 = solve_reg2(x1, Y, w)
+
+  # about 18 times faster
+  @test β ≈ β1
+  @test β ≈ β2
+end
+
+@testset "solver vec: y" begin
+  w = dMat[1, :]
+  β = solve_reg(x1, y, w)[:]
+  @test solve_reg2(x1, y, w) ≈ β
+  @test solve_chol(x1, y, w)[:] ≈ β
+end
+
+function test()
+  for i in 1:100
+    β = solve_chol!(solver, x1, Y, w)
+  end
+end

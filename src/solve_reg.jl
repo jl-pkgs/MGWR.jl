@@ -8,6 +8,7 @@ export solve_reg, solve_reg2
 ̂y = S y = x_i C_i y
 """
 function solve_reg2(X::AbstractMatrix{T}, Y::AbstractMatrix{T}, w::AbstractVector{T}) where {T<:Real}
+  Xt = X'
   XtW = (X .* w)'
   XtWx = XtW * X
   XtWx_inv = inv(XtWx)
@@ -18,7 +19,7 @@ function solve_reg2(X::AbstractMatrix{T}, Y::AbstractMatrix{T}, w::AbstractVecto
 
   @inbounds @threads for i in 1:ntime
     y = @view Y[:, i]
-    XtWy = X' * (w .* y)
+    XtWy = Xt * (w .* y)
     βᵢ = XtWx_inv * XtWy  # Li 2019, Eq. 9  
     β[:, i] .= βᵢ[:]
   end

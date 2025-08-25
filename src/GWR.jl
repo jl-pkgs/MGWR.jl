@@ -37,6 +37,7 @@ function GWR(model::MGWR)
   GWR(x1, y, wMat_rp)
 end
 
+
 #! deprecated, low efficiency
 function GWR(x::Matrix{T}, y::Vector{T}, dMat::AbstractMatrix{T}, bw::T;
   kernel::Int, adaptive::Bool=false)::Matrix{T} where {T<:Real}
