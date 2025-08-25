@@ -1,8 +1,6 @@
 using MixedGWR, RTableTools, Test
 using SpatRasters, Distances, ArchGDAL
 
-Base.Matrix(x::AbstractVector) = reshape(x, length(x), 1)
-
 
 # load data
 begin

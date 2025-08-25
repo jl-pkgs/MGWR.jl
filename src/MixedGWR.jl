@@ -1,6 +1,7 @@
 module MixedGWR
 
 using LoopVectorization
+using ProgressMeter
 using LinearAlgebra, Statistics
 using Parameters
 using Base.Threads
@@ -9,6 +10,7 @@ import Base.summary
 
 export MGWR, update_weight!
 export GWR
+export ST_GWR
 export GWR_mixed, GWR_mixed_trace, gwr_q, gw_weight_vec, solver_reg, fitted
 export fitted, fitted!, predict, summary
 
@@ -25,6 +27,8 @@ include("solve_reg.jl")
 include("GWR.jl")
 include("GWR_calib.jl")
 include("deprecated.jl")
+
+include("ST_GWR.jl")
 
 include("GWR_mixed.jl")
 include("GWR_mixed_trace.jl")

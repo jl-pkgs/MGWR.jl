@@ -1,5 +1,16 @@
 # x1: local, x2: global
 # ~4 times faster
+model = MGWR(x1, x2, y, dMat; kernel=BISQUARE, adaptive=true, bw=20.0)
+
+@testset "GWR_calib" begin
+  β = GWR(model)
+  res = GWR_calib(model)
+  β2 = res.β
+  β ≈ β2
+  res.trace ≈ 29.296714491744776
+  res.AIC ≈ 1308.7723907048241
+end
+
 @testset "GWR_mixed" begin
   @time res_r = GWR_mixed_r(x1, x2, y, dMat)
   @time res1 = GWR_mixed(x1, x2, y, dMat, dMat, 20.0; kernel=BISQUARE, adaptive=true)
