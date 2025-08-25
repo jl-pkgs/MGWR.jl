@@ -7,6 +7,14 @@
 
 > Translated from R package GWmodel
 
+## Examples
+
+- Spatial: [example/ex01_spatial.jl](example/ex01_spatial.jl)
+
+- SpatioTemporal: [example/ex02_spatiotemporal.jl](example/ex02_spatiotemporal.jl)
+
+<!-- <img src="./example/Figure1_GWR.png" style="zoom:50%;" /> -->
+
 ## References
 
 1. <https://github.com/GWmodel-Lab/GWmodel>

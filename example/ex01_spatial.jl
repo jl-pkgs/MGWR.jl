@@ -58,12 +58,20 @@ res.A[:, :, 2] .= reshape(y_GWR2, nlon, nlat)
 res.A[:, :, 3] .= reshape(y_MGWR, nlon, nlat)
 
 begin
+  function fun_axis(ax)
+    scatter!(ax, x[:, 1], x[:, 2]; color=y, strokecolor=:white, strokewidth=0.6, colorrange, colormap=colors)
+  end
+  colorrange = (0, 60)
+  colors = amwg256
+
   fig = Figure(; size=(1400, 900))
-  imagesc!(fig, lon, lat, res.A;
-    colorrange=(0, 60),
+  axs, plts = imagesc!(fig, lon, lat, res.A;
+    colors, colorrange, fun_axis, 
+    colorbar = (; width = 20), 
     titles=[
       "(a) GWR: (lon + lat)",
       "(b) GWR: (lon + lat + alt)",
       "(c) MGWR: (lon + lat) + alt"])
   fig
 end
+save("Figure1_GWR.png", fig)
