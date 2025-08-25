@@ -15,7 +15,7 @@ begin
   Xpred = cbind(X1, X2)
 end
 
-f = "/mnt/z/GitHub/jl-pkgs/SpatRasters.jl/Project_十堰/data/ShiYan_Pobs_interpolated_by_IDW.jld2"
+f = "/mnt/z/GitHub/jl-pkgs/SpatRasters.jl/Project_十堰/data/ShiYan_Pobs_interpolated_by_IDW.jld2" |> path_mnt
 l = jldopen(f)
 @unpack st, dates, P = l
 
@@ -51,8 +51,10 @@ adaptive = false
 bandwidths = [10.0, 20, 30, 50] # in km
 
 ## 考虑高程效果更好一些
+outdir = "/mnt/z/GitHub/jl-pkgs/SpatRasters.jl/Project_十堰/OUTPUT" |> path_mnt
+
 for bw in bandwidths
-  fout = "ShiYan_Prcp_Gauged237_201404-202501_2km_GWR3(adaptive=$adaptive,bw=$bw).nc"
+  fout = "$outdir/ShiYan_Prcp_Gauged237_201404-202501_2km_GWR3(adaptive=$adaptive,bw=$bw).nc"
   isfile(fout) && continue
 
   kernel = BISQUARE
