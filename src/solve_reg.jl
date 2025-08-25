@@ -46,8 +46,6 @@ function solve_reg(X::AbstractMatrix{T}, Y::AbstractMatrix{T}, w::AbstractVector
 end
 
 
-Base.Matrix(x::Vector) = reshape(x, length(x), 1)
-
 solve_reg(X::AbstractMatrix{T}, y::AbstractVector{T}, w::AbstractVector{T}) where {T<:Real} =
   solve_reg(X, Matrix(y), w)
 

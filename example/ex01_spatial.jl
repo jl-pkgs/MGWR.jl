@@ -34,6 +34,7 @@ begin
   n_target = size(X1, 1)
 end
 
+
 # bw: in km
 model = MGWR(x1, x2, y, dMat, dMat_rp; kernel=BISQUARE, adaptive=true, bw=20.0)
 β = GWR(model)
@@ -60,11 +61,11 @@ res.A[:, :, 3] .= reshape(y_MGWR, nlon, nlat)
 
 begin
   fig = Figure(; size=(1400, 900))
-  imagesc!(fig, lon, lat, res.A; 
-    colorrange=(0, 60), 
-    titles = [
-      "(a) GWR: (lon + lat)", 
-      "(b) GWR: (lon + lat + alt)", 
+  imagesc!(fig, lon, lat, res.A;
+    colorrange=(0, 60),
+    titles=[
+      "(a) GWR: (lon + lat)",
+      "(b) GWR: (lon + lat + alt)",
       "(c) MGWR: (lon + lat) + alt"])
   fig
 end

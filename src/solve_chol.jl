@@ -1,6 +1,5 @@
 # https://chatgpt.com/c/68aadc51-a978-8326-8880-9df82cecb413
 using LinearAlgebra
-using LoopVectorization
 
 export GWRSolver
 export solve_chol!, solve_chol
