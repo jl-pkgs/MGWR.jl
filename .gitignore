@@ -2,4 +2,5 @@ Manifest.toml
 
 *.pdf
 docs
-*.png
+# *.png
+*.nc
