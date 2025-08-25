@@ -8,7 +8,8 @@ GWR with specified distance matrix
 - `β`: [n_target, k_local]
 提前算好权重，进行加速
 """
-function GWR!(β::AbstractMatrix{T}, X::AbstractMatrix{T}, Y::AbstractVecOrMat{T},
+function GWR!(β::AbstractMatrix{T}, 
+  X::AbstractMatrix{T}, Y::AbstractVector{T},
   wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}
   # k_local = size(X, 2)
   # n_control = size(x, 1)
@@ -22,8 +23,8 @@ function GWR!(β::AbstractMatrix{T}, X::AbstractMatrix{T}, Y::AbstractVecOrMat{T
   return β
 end
 
-
-function GWR(X::AbstractMatrix{T}, Y::AbstractVecOrMat, 
+# AbstractVecOrMat
+function GWR(X::AbstractMatrix{T}, Y::AbstractVector{T},
   wMat::AbstractMatrix{T})::Matrix{T} where {T<:Real}
   n_target = size(wMat, 2)
   k_local = size(X, 2)

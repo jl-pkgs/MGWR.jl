@@ -1,6 +1,5 @@
-using Base.Threads
-using Ipaper
-
+using MixedGWR, SpatRasters, ArchGDAL
+using Ipaper, RTableTools, Distances
 
 # load data
 begin
@@ -42,7 +41,7 @@ end
 # 5 second, (69696, 1000) [n_target, n_time]
 
 np = 2 # lon + lat
-@time Ypred2 = main_GWR(X[:, 1:np], Y, wMat_rp; Xpred = Xpred[:, 1:np]);
+@time Ypred2 = ST_GWR(X[:, 1:np], Y, wMat_rp; Xpred = Xpred[:, 1:np]);
 
 np = 3 # lon + lat + alt
-@time Ypred3 = main_GWR(X[:, 1:np], Y, wMat_rp; Xpred=Xpred[:, 1:np]);
+@time Ypred3 = ST_GWR(X[:, 1:np], Y, wMat_rp; Xpred=Xpred[:, 1:np]);
